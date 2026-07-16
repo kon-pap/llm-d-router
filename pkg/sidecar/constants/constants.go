@@ -37,4 +37,10 @@ const (
 
 	// ECConnectorNIXL enables the Encoder disaggregation NIXL protocol (E/PD, E/P/D)
 	ECConnectorNIXL = "ec-nixl"
+
+	// ECExampleConnector enables the Encoder disaggregation protocol (E/PD, E/P/D)
+	IOExampleConnector = "io-example"
+
+	// ECConnectorNIXL enables the Encoder disaggregation NIXL protocol (E/PD, E/P/D)
+	IOP2PConnector = "io-p2p"
 )

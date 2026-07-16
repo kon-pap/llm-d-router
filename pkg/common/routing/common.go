@@ -68,6 +68,12 @@ const (
 	// EndpointPinHeader carries the worker <ip:port> a request must be scheduled
 	// on. The endpoint-pin-screener keeps only that endpoint.
 	EndpointPinHeader = "x-llm-d-pin-host-port"
+	
+	// PreprocessEndpointHeader is the header name used to indicate Preprocess worker <ip:port>
+	PreprocessEndpointHeader = "x-preprocess-host-port"
+
+	// InfereceEndpointsHeader is the header name used to indicate Inference workers <ip:port> list
+	InfereceEndpointsHeader = "x-inference-hosts-ports"
 )
 
 // StripScheme removes the scheme from an endpoint URL, returning host:port.

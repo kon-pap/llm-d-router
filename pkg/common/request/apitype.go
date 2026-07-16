@@ -29,6 +29,7 @@ const (
 	PathMessages        = "/v1/messages"
 	PathVLLMGenerate    = "/inference/v1/generate"
 	PathSGLangGenerate  = "/generate"
+	PathPooling         = "/pooling"
 )
 
 // APIType is the inference API a request was sent to. Path and the output
