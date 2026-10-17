@@ -351,7 +351,7 @@ func (h *IOHandler) ProcessResults(
 
 // PreRequest wires preprocess and inference SchedulerProfile results into headers
 // so the sidecar knows which pods to contact for disaggregated work.
-func (h *IOHandler) PreRequest(ctx context.Context, request *scheduling.InferenceRequest, schedulingResult *scheduling.SchedulingResult) {
+func (h *IOHandler) PreRequest(ctx context.Context, request *scheduling.InferenceRequest, schedulingResult *scheduling.SchedulingResult) error {
 	tracer := tracing.Tracer(schedplugins.TracerScope)
 	_, span := tracer.Start(ctx, "prepare_io_disaggregation",
 		trace.WithSpanKind(trace.SpanKindInternal),
@@ -365,7 +365,7 @@ func (h *IOHandler) PreRequest(ctx context.Context, request *scheduling.Inferenc
 			attribute.Bool("llm_d.epp.postprocess.disaggregation_used", false),
 			attribute.String("llm_d.epp.io_disagg.reason", "request_is_nil"),
 		)
-		return
+		return nil
 	}
 	if schedulingResult == nil {
 		span.SetAttributes(
@@ -374,7 +374,7 @@ func (h *IOHandler) PreRequest(ctx context.Context, request *scheduling.Inferenc
 			attribute.Bool("llm_d.epp.postprocess.disaggregation_used", false),
 			attribute.String("llm_d.epp.io_disagg.reason", "scheduling_result_is_nil"),
 		)
-		return
+		return nil
 	}
 
 	if request.TargetModel != "" {
@@ -391,7 +391,7 @@ func (h *IOHandler) PreRequest(ctx context.Context, request *scheduling.Inferenc
 			attribute.Bool("llm_d.epp.preprocess.disaggregation_used", false),
 			attribute.String("llm_d.epp.preprocess.reason", "no_preprocess_profile_target_endpoints"),
 		)
-		return
+		return nil
 	default:
 		targetPod := preprocessProfileRunResult.TargetEndpoints[0].GetMetadata()
 		preprocessHostPort := net.JoinHostPort(targetPod.Address, targetPod.Port)
@@ -411,7 +411,7 @@ func (h *IOHandler) PreRequest(ctx context.Context, request *scheduling.Inferenc
 			attribute.Bool("llm_d.epp.inference.disaggregation_used", false),
 			attribute.String("llm_d.epp.inference.reason", "no_inference_profile_result"),
 		)
-		return
+		return nil
 	}
 
 	var inferenceHostPorts []string
@@ -425,7 +425,7 @@ func (h *IOHandler) PreRequest(ctx context.Context, request *scheduling.Inferenc
 			attribute.Bool("llm_d.epp.inference.disaggregation_used", false),
 			attribute.String("llm_d.epp.inference.reason", "no_inference_profile_target_endpoints"),
 		)
-		return
+		return nil
 	}
 
 	request.Headers[routing.InfereceEndpointsHeader] = strings.Join(inferenceHostPorts, ",")
@@ -433,5 +433,5 @@ func (h *IOHandler) PreRequest(ctx context.Context, request *scheduling.Inferenc
 		attribute.Bool("llm_d.epp.inference.disaggregation_used", true),
 		attribute.String("llm_d.epp.inference.endpoints", strings.Join(inferenceHostPorts, ",")),
 	)
-
+	return nil
 }

@@ -31,6 +31,7 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	"github.com/llm-d/llm-d-router/pkg/common/observability/tracing"
+	reqcommon "github.com/llm-d/llm-d-router/pkg/common/request"
 )
 
 // fanoutInference fans out one inference request per item, in parallel, with
@@ -113,7 +114,7 @@ func (s *Server) fanoutInference(
 				return err
 			}
 			req.Header.Set("Content-Type", "application/json")
-			req.Header.Set(requestHeaderRequestID, infReqID)
+			req.Header.Set(reqcommon.RequestIDHeaderKey, infReqID)
 
 			s.logger.Info("sending inference request", "inference requestID", infReqID, "to", hostPort)
 
@@ -184,7 +185,7 @@ func (s *Server) handleIOCommon(w http.ResponseWriter, r *http.Request, preproce
 	}
 
 	// Use X-Request-Id header if present, otherwise generate a new UUID.
-	requestID := r.Header.Get(requestHeaderRequestID)
+	requestID := r.Header.Get(reqcommon.RequestIDHeaderKey)
 	if requestID == "" {
 		reqUUID, err := uuid.NewUUID()
 		if err != nil {
@@ -234,7 +235,7 @@ func (s *Server) handleIOCommon(w http.ResponseWriter, r *http.Request, preproce
 		return
 	}
 	preprocessReq.Header.Set("Content-Type", "application/json")
-	preprocessReq.Header.Set(requestHeaderRequestID, requestID)
+	preprocessReq.Header.Set(reqcommon.RequestIDHeaderKey, requestID)
 
 	s.logger.Info("executing preprocessing", "requestID", requestID, "preprocessHostPort", preprocessHostPort)
 	pw := &bufferedResponseWriter{}
@@ -336,7 +337,7 @@ func (s *Server) handleIOCommon(w http.ResponseWriter, r *http.Request, preproce
 		return
 	}
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set(requestHeaderRequestID, fmt.Sprintf("pooling-%s", requestID))
+	req.Header.Set(reqcommon.RequestIDHeaderKey, fmt.Sprintf("pooling-%s", requestID))
 
 	// Decoder proxy in this case is the postprocessor instance. It sends the request to the vLLM server (localhost:vLLMPort)
 	s.logger.Info("executing postprocessing", "requestID", requestID)

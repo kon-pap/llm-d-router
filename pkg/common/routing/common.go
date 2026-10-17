@@ -68,7 +68,7 @@ const (
 	// EndpointPinHeader carries the worker <ip:port> a request must be scheduled
 	// on. The endpoint-pin-screener keeps only that endpoint.
 	EndpointPinHeader = "x-llm-d-pin-host-port"
-	
+
 	// PreprocessEndpointHeader is the header name used to indicate Preprocess worker <ip:port>
 	PreprocessEndpointHeader = "x-preprocess-host-port"
 
