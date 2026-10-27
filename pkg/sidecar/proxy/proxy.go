@@ -374,8 +374,8 @@ func NewProxy(config Config) *Server {
 	prefillerCache, _ := lru.New[string, http.Handler](1024)
 	encoderCache, _ := lru.New[string, http.Handler](1024)
 	mooncakeEngineIDs, _ := lru.New[string, map[string]string](1024)
-	preprocessCache, _ := lru.New[string, http.Handler](1024) // nolint:errcheck
-	inferenceCache, _ := lru.New[string, http.Handler](1024)  // nolint:errcheck
+	preprocessCache, _ := lru.New[string, http.Handler](1024)
+	inferenceCache, _ := lru.New[string, http.Handler](1024)
 
 	server := &Server{
 		readyCh:             make(chan struct{}),
@@ -615,7 +615,7 @@ func (s *Server) createRoutes() *http.ServeMux {
 			handler(w, r)
 		})
 	}
-	handler := s.disaggregatedIOProcessorHandler(reqcommon.DetectAPIType(reqcommon.PathPooling))
+	handler := s.disaggregatedIOProcessorHandler()
 	mux.HandleFunc("POST "+reqcommon.PathPooling, handler)
 	mux.HandleFunc("POST "+reqcommon.PathPooling+"/{$}", func(w http.ResponseWriter, r *http.Request) {
 		r = r.Clone(r.Context())
